@@ -1,7 +1,7 @@
 #include "Wire.h"
 #include "MCP4725.h"
 
-#define PARSE_AMOUNT 3         // число значений в массиве, который хотим получить
+#define PARSE_AMOUNT 4         // число значений в массиве, который хотим получить
 #define start_com '[' 
 #define end_com ']' 
 #define delCom '=' 
@@ -95,7 +95,7 @@ void ParseArray(int *Array, String str)
   }
 
 void greeting() {
-  Serial.println("Enter the command: [RECORD=numSteps pause(ms) angle]");  
+  Serial.println("Enter the command: [RECORD=numSteps pause(ms) angle pauseScan(ms)]");  
   ifGreeting = 1;
 }
 
@@ -132,6 +132,15 @@ void record(int *Array){
       Serial.print(Array[i]); Serial.print(" ");
     } Serial.println();
 
+  for (int i=0; i < Array[0]; i++){
+    //Serial.print(i);
+    //digitalWrite(MOS_PIN1, HIGH);
+    //digitalWrite(MOS_PIN1, LOW);
+    MCP_X.setValue(Array[2]*(i+1));
+    delay(Array[1]);
+  }
+  //MCP_X.setValue(0);
+  delay(Array[3]);
   for (int i=0; i < Array[0]; i++){
     //Serial.print(i);
     //digitalWrite(MOS_PIN1, HIGH);

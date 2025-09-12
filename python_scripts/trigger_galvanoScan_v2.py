@@ -19,6 +19,7 @@ def send_command():
     galvano_axis = galvano_axis_box.get(1.0, 'end-1c')
     galvano_steps = galvano_steps_box.get(1.0, 'end-1c')
     galvano_pause = galvano_pause_box.get(1.0, 'end-1c')
+    pause_scan = pause_scan_box.get(1.0, 'end-1c')
 
     #"[RECORD=10 5000]"
     commandTrig = '[RECORD=' + num_iter + ' ' +\
@@ -37,8 +38,9 @@ def send_command():
         #print(commandGalvano)
     commandGalvano = '[RECORD=' + str(int(galvano_steps)) + ' ' + \
                       str(int(galvano_pause)) + ' ' + \
-                      str(int(galvano_angle))+']'
-
+                      str(int(galvano_angle)) + ' ' + \
+                      str(int(pause_scan))+']'
+    print(commandGalvano)
     serialGalvano.write(commandGalvano.encode())
         #sleep(int(galvano_pause) / 1000.0)
         #spinwait_us(int(galvano_pause))
@@ -92,7 +94,7 @@ def open_port_galvano():
 
 win = Tk()
 win.title('Command')
-win.geometry("600x200")
+win.geometry("800x400")
 
 # Creating a text box widget
 numCol, numRow = 0, 1
@@ -136,6 +138,13 @@ label_galvano_axis.grid(column=numCol, row=numRow)
 galvano_axis_box = Text(win, height=1, width=40)
 galvano_axis_box.insert(1.0, 'x')
 galvano_axis_box.grid(column=numCol+1, row=numRow)
+
+numRow +=1
+label_pause_scan = Label(win, text='Pause between scans (ms)')
+label_pause_scan.grid(column=numCol, row=numRow)
+pause_scan_box = Text(win, height=1, width=40)
+pause_scan_box.insert(1.0, '10000')
+pause_scan_box.grid(column=numCol+1, row=numRow)
 
 numRow +=1
 label_numCOMport = Label(win, text='COMport num. for trigger')

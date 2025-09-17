@@ -6,6 +6,8 @@
 #define end_com ']' 
 #define delCom '=' 
 
+unsigned long timing;
+
 MCP4725 MCP_X(0x60);
 MCP4725 MCP_Y(0x61);
 MCP4725 MCP_user(0x0);
@@ -125,24 +127,53 @@ void record(int *Array){
       Serial.print(Array[i]); Serial.print(" ");
     } Serial.println();
 
-  //MCP_user
-  Serial.print(Array[4]);
   if (Array[4] == 0){
     MCP_user = MCP_X;
   } else {
     MCP_user = MCP_Y;
   }
 
-  for (int i=0; i < Array[0]; i++){
+  /*if (millis() - timing > 10000){ // Вместо 10000 подставьте нужное вам значение паузы 
+  timing = millis(); 
+  Serial.println ("10 seconds");
+ }*/
+  
+  /*for (int i=0; i < Array[0]; i++){
     MCP_user.setValue(Array[2]*(i+1));
-    delay(Array[1]);
+    //timing = millis();
+    if (millis() - timing > Array[1]){
+      timing = millis();
+    }
+    //delay(Array[1]);
+  }*/
+  int i=0;
+  while (i<Array[0]){
+    MCP_user.setValue(Array[2]*i);
+    if (millis() - timing > Array[1]){
+      timing = millis();
+      i++;
+    }
   }
+  /*if (millis() - timing > Array[3]){
+    timing = millis();
+    Serial.println("pause");
+  }*/
   delay(Array[3]);
-  for (int i=Array[0]-1; i >= 0; i--){
+  /*for (int i=Array[0]-1; i >= 0; i--){
     MCP_user.setValue(Array[2]*(i+1));
     delay(Array[1]);
   }
-  MCP_user.setValue(0);
+  MCP_user.setValue(0);*/
+  i=Array[0]-1;
+  while (i>=0){
+    MCP_user.setValue(Array[2]*i);
+    //timing = millis();
+    if (millis() - timing > Array[1]){
+      timing = millis();
+      i--;
+    }
+  }
+
 }
 
 void loop() {

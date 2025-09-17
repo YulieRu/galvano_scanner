@@ -1,13 +1,14 @@
 #include "Wire.h"
 #include "MCP4725.h"
 
-#define PARSE_AMOUNT 4         // число значений в массиве, который хотим получить
+#define PARSE_AMOUNT 5         // число значений в массиве, который хотим получить
 #define start_com '[' 
 #define end_com ']' 
 #define delCom '=' 
 
 MCP4725 MCP_X(0x60);
 MCP4725 MCP_Y(0x61);
+MCP4725 MCP_user(0x0);
 
 int intData[PARSE_AMOUNT];
 boolean getStarted;
@@ -28,17 +29,9 @@ void setup(){
   MCP_Y.begin();
   MCP_Y.setValue(0);
 }
-//void loop()
-//{
-//  if (Serial.available()) 
-//    {
-//      parseCommand(Serial.readStringUntil("\r\n"));
-//    }
-//}
 
 void parseCommand(String com) 
 {
-  //Добавил переменную длины команды.
   String commandName=com.substring(com.indexOf("[")+1, com.indexOf("="));
   String commandValue=com.substring(com.indexOf("=")+1,com.indexOf("]"));
   int commandValLen = commandValue.length();
@@ -95,7 +88,7 @@ void ParseArray(int *Array, String str)
   }
 
 void greeting() {
-  Serial.println("Enter the command: [RECORD=numSteps pause(ms) angle pauseScan(ms)]");  
+  Serial.println("Enter the command: [RECORD=numSteps pause(ms) angle pauseScan(ms) axis(0 (x) or 1 (y)]");  
   ifGreeting = 1;
 }
 
@@ -132,23 +125,25 @@ void record(int *Array){
       Serial.print(Array[i]); Serial.print(" ");
     } Serial.println();
 
+  //MCP_user
+  Serial.print(Array[4]);
+  if (Array[4] == 0){
+    MCP_user = MCP_X;
+  } else {
+    MCP_user = MCP_Y;
+  }
+
   for (int i=0; i < Array[0]; i++){
-    //Serial.print(i);
-    //digitalWrite(MOS_PIN1, HIGH);
-    //digitalWrite(MOS_PIN1, LOW);
-    MCP_X.setValue(Array[2]*(i+1));
+    MCP_user.setValue(Array[2]*(i+1));
     delay(Array[1]);
   }
   //MCP_X.setValue(0);
   delay(Array[3]);
   for (int i=0; i < Array[0]; i++){
-    //Serial.print(i);
-    //digitalWrite(MOS_PIN1, HIGH);
-    //digitalWrite(MOS_PIN1, LOW);
-    MCP_X.setValue(Array[2]*(i+1));
+    MCP_user.setValue(Array[2]*(i+1));
     delay(Array[1]);
   }
-  MCP_X.setValue(0);
+  MCP_user.setValue(0);
 }
 
 void loop() {

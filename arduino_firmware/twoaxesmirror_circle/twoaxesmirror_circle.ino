@@ -137,9 +137,8 @@ void record(int *Array){
     MCP_user.setValue(Array[2]*(i+1));
     delay(Array[1]);
   }
-  //MCP_X.setValue(0);
   delay(Array[3]);
-  for (int i=0; i < Array[0]; i++){
+  for (int i=Array[0]-1; i >= 0; i--){
     MCP_user.setValue(Array[2]*(i+1));
     delay(Array[1]);
   }

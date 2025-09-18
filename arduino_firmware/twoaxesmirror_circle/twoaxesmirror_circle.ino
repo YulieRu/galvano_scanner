@@ -6,7 +6,7 @@
 #define end_com ']' 
 #define delCom '=' 
 
-unsigned long timing;
+unsigned long timing=0;
 
 MCP4725 MCP_X(0x60);
 MCP4725 MCP_Y(0x61);
@@ -122,60 +122,6 @@ void parsing() {
   }
 }
 
-void record(int *Array){
-  for (byte i = 0; i < PARSE_AMOUNT; i++) { // выводим элементы массива
-      Serial.print(Array[i]); Serial.print(" ");
-    } Serial.println();
-
-  if (Array[4] == 0){
-    MCP_user = MCP_X;
-  } else {
-    MCP_user = MCP_Y;
-  }
-
-  /*if (millis() - timing > 10000){ // Вместо 10000 подставьте нужное вам значение паузы 
-  timing = millis(); 
-  Serial.println ("10 seconds");
- }*/
-  
-  /*for (int i=0; i < Array[0]; i++){
-    MCP_user.setValue(Array[2]*(i+1));
-    //timing = millis();
-    if (millis() - timing > Array[1]){
-      timing = millis();
-    }
-    //delay(Array[1]);
-  }*/
-  int i=0;
-  while (i<Array[0]){
-    MCP_user.setValue(Array[2]*i);
-    if (millis() - timing > Array[1]){
-      timing = millis();
-      i++;
-    }
-  }
-  /*if (millis() - timing > Array[3]){
-    timing = millis();
-    Serial.println("pause");
-  }*/
-  delay(Array[3]);
-  /*for (int i=Array[0]-1; i >= 0; i--){
-    MCP_user.setValue(Array[2]*(i+1));
-    delay(Array[1]);
-  }
-  MCP_user.setValue(0);*/
-  i=Array[0]-1;
-  while (i>=0){
-    MCP_user.setValue(Array[2]*i);
-    //timing = millis();
-    if (millis() - timing > Array[1]){
-      timing = millis();
-      i--;
-    }
-  }
-
-}
-
 void loop() {
   if (ifGreeting == 0) {greeting();};
   parsing();       // функция парсинга
@@ -184,7 +130,38 @@ void loop() {
   
   if (commandName.equalsIgnoreCase("RECORD")){
     Serial.println("RECORD");
-    record(intData);
+    
+    if (intData[4] == 0){
+      MCP_user = MCP_X;
+    } else {
+      MCP_user = MCP_Y;
+    }
+
+    int i=0;
+    while (i<intData[0]){
+      MCP_user.setValue(intData[2]*i);
+      if (millis() - timing > intData[1]){
+        timing = millis();
+        i++;
+      }
+    }
+  
+    while (true) {
+      if (millis() - timing > intData[3]){ // Вместо 10000 подставьте нужное вам значение паузы 
+        timing = millis(); 
+        break;
+      }
+    }
+  
+    i=intData[0]-1;
+    while (i>=0){
+      MCP_user.setValue(intData[2]*i);
+      //timing = millis();
+      if (millis() - timing > intData[1]){
+        timing = millis();
+        i--;
+      }
+    }
   } else {
     Serial.println("No such command. Try RECORD");
   }

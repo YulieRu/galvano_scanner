@@ -7,6 +7,8 @@
 #define delCom '=' 
 
 unsigned long timing=0;
+unsigned long start_time=0;
+unsigned long next=0;
 
 MCP4725 MCP_X(0x60);
 MCP4725 MCP_Y(0x61);
@@ -138,29 +140,38 @@ void loop() {
     }
 
     int i=0;
+    start_time=millis();
     while (i<intData[0]){
       MCP_user.setValue(intData[2]*i);
-      if (millis() - timing > intData[1]){
-        timing = millis();
-        i++;
-      }
+      next = start_time+i*intData[1];
+      //if (millis() - timing -next > intData[1]){
+      //  timing = millis();
+      //  i++;
+      //}
+      i++;
+      delay(next-millis());
     }
   
-    while (true) {
+    /*while (true) {
       if (millis() - timing > intData[3]){ // Вместо 10000 подставьте нужное вам значение паузы 
         timing = millis(); 
         break;
       }
-    }
+    }*/
+    //delay(intData[3]);
   
-    i=intData[0]-1;
+    i=intData[0]-2;
+    start_time=millis();
     while (i>=0){
       MCP_user.setValue(intData[2]*i);
+      next = start_time+(intData[0]-2-i)*intData[1];
       //timing = millis();
-      if (millis() - timing > intData[1]){
-        timing = millis();
-        i--;
-      }
+      //if (millis() - timing > intData[1]){
+      //  timing = millis();
+      //  i--;
+      //}
+      i--;
+      delay(next-millis());
     }
   } else {
     Serial.println("No such command. Try RECORD");

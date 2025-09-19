@@ -14,7 +14,7 @@ MCP4725 MCP_X(0x60);
 MCP4725 MCP_Y(0x61);
 MCP4725 MCP_user(0x0);
 
-int intData[PARSE_AMOUNT];
+double commandsData[PARSE_AMOUNT];
 boolean getStarted;
 boolean recievedFlag;
 byte index;
@@ -103,7 +103,7 @@ void parsing() {
       if (incomingByte != ' ' && incomingByte != end_com) {   // если это не пробел И не конец
         string_convert += incomingByte;       // складываем в строку
       } else {                                // если это пробел или ; конец пакета
-        intData[index] = string_convert.toInt();  // преобразуем строку в int и кладём в массив
+        commandsData[index] = string_convert.toDouble();  // преобразуем строку в int и кладём в массив
         string_convert = "";                  // очищаем строку
         index++;                              // переходим к парсингу следующего элемента массива
       }
@@ -133,45 +133,49 @@ void loop() {
   if (commandName.equalsIgnoreCase("RECORD")){
     Serial.println("RECORD");
     
-    if (intData[4] == 0){
+    if (commandsData[4] == 0){
       MCP_user = MCP_X;
     } else {
       MCP_user = MCP_Y;
     }
+    commandsData[1] *= 1000;
+    commandsData[3] *= 1000;
 
     int i=0;
-    start_time=millis();
-    while (i<intData[0]){
-      MCP_user.setValue(intData[2]*i);
-      next = start_time+i*intData[1];
-      //if (millis() - timing -next > intData[1]){
+    start_time=micros();
+    while (i<commandsData[0]){
+      MCP_user.setValue(commandsData[2]*i);
+      delayMicroseconds(10);
+      next = start_time+i*commandsData[1];
+      //if (millis() - timing -next > commandsData[1]){
       //  timing = millis();
       //  i++;
       //}
       i++;
-      delay(next-millis());
+      delayMicroseconds(next-micros());
     }
   
     /*while (true) {
-      if (millis() - timing > intData[3]){ // Вместо 10000 подставьте нужное вам значение паузы 
+      if (millis() - timing > commandsData[3]){ // Вместо 10000 подставьте нужное вам значение паузы 
         timing = millis(); 
         break;
       }
     }*/
-    //delay(intData[3]);
+    //delay(commandsData[3]);
   
-    i=intData[0]-2;
-    start_time=millis();
+    i=commandsData[0]-2;
+    start_time=micros();
     while (i>=0){
-      MCP_user.setValue(intData[2]*i);
-      next = start_time+(intData[0]-2-i)*intData[1];
+      MCP_user.setValue(commandsData[2]*i);
+      delayMicroseconds(10);
+      next = start_time+(commandsData[0]-2-i)*commandsData[1];
       //timing = millis();
-      //if (millis() - timing > intData[1]){
+      //if (millis() - timing > commandsData[1]){
       //  timing = millis();
       //  i--;
       //}
       i--;
-      delay(next-millis());
+      delayMicroseconds(next-micros());
     }
   } else {
     Serial.println("No such command. Try RECORD");

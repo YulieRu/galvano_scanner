@@ -9,6 +9,7 @@
 unsigned long timing=0;
 unsigned long start_time=0;
 unsigned long next=0;
+unsigned int t_max = 4294967295;
 
 MCP4725 MCP_X(0x60);
 MCP4725 MCP_Y(0x61);
@@ -147,33 +148,25 @@ void loop() {
       MCP_user.setValue(commandsData[2]*i);
       delayMicroseconds(10);
       next = start_time+i*commandsData[1];
-      //if (millis() - timing -next > commandsData[1]){
-      //  timing = millis();
-      //  i++;
-      //}
+      if (next>t_max){
+        start_time=start_time-t_max;
+        next=next-t_max;
+      }
+      //while(micros()<next){}
       i++;
       delayMicroseconds(next-micros());
     }
-  
-    /*while (true) {
-      if (millis() - timing > commandsData[3]){ // Вместо 10000 подставьте нужное вам значение паузы 
-        timing = millis(); 
-        break;
-      }
-    }*/
-    //delay(commandsData[3]);
-  
     i=commandsData[0]-2;
     start_time=micros();
     while (i>=0){
       MCP_user.setValue(commandsData[2]*i);
       delayMicroseconds(10);
       next = start_time+(commandsData[0]-2-i)*commandsData[1];
-      //timing = millis();
-      //if (millis() - timing > commandsData[1]){
-      //  timing = millis();
-      //  i--;
-      //}
+      if (next>t_max){
+        start_time=start_time-t_max;
+        next=next-t_max;
+      }
+      //while(micros()<next){}
       i--;
       delayMicroseconds(next-micros());
     }

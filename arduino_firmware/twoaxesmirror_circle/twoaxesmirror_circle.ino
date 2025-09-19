@@ -58,7 +58,7 @@ void parseCommand(String com)
           ParseArray(values, commandValue);
           MCP_X.setValue(values[0]);
           //while (!MCP_X.ready()) {};
-          delayMicroseconds(10);
+          delay(10);
           Serial.println("Ready");
         }
     }
@@ -74,7 +74,7 @@ void parseCommand(String com)
           ParseArray(values, commandValue);
           MCP_Y.setValue(values[0]);
           //while (!MCP_Y.ready()) {};
-          delayMicroseconds(10);
+          delay(10);
           Serial.println("Ready");
         } 
     }    
@@ -139,36 +139,41 @@ void loop() {
     } else {
       MCP_user = MCP_Y;
     }
-    commandsData[1] *= 1000;
-    commandsData[3] *= 1000;
+    //commandsData[1] *= 1000.0;
+    //commandsData[3] *= 1000.0;
+    Serial.println(commandsData[1]);
 
     int i=0;
-    start_time=micros();
+    start_time=millis();
     while (i<commandsData[0]){
       MCP_user.setValue(commandsData[2]*i);
       delayMicroseconds(10);
       next = start_time+i*commandsData[1];
-      if (next>t_max){
-        start_time=start_time-t_max;
-        next=next-t_max;
-      }
-      //while(micros()<next){}
+      //if (next>t_max){
+      //  start_time=start_time-t_max;
+      //  next=next-t_max;
+      //}
+      //while(millis()<next){}
       i++;
-      delayMicroseconds(next-micros());
+      delay(next-millis());
+      //Serial.println();
+      //Serial.println(start_time);
+      //Serial.println(next);
+      //Serial.println();
     }
     i=commandsData[0]-2;
-    start_time=micros();
+    start_time=millis();
     while (i>=0){
       MCP_user.setValue(commandsData[2]*i);
       delayMicroseconds(10);
       next = start_time+(commandsData[0]-2-i)*commandsData[1];
-      if (next>t_max){
-        start_time=start_time-t_max;
-        next=next-t_max;
-      }
-      //while(micros()<next){}
+      //if (next>t_max){
+      //  start_time=start_time-t_max;
+      //  next=next-t_max;
+      //}
+      //while(millis()<next){}
       i--;
-      delayMicroseconds(next-micros());
+      delay(next-millis());
     }
   } else {
     Serial.println("No such command. Try RECORD");
